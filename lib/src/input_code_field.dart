@@ -178,6 +178,7 @@ class InputCodeDecoration {
   final BoxDecoration focusedBox;
   final double width;
   final double height;
+  final double focusAlignment;
 
   const InputCodeDecoration({
     this.color,
@@ -189,6 +190,7 @@ class InputCodeDecoration {
     this.focusedBox,
     this.width: 0.0,
     this.height: 56.0,
+    this.focusAlignment: -16.0,
   });
 }
 
@@ -343,7 +345,7 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
         () => Scrollable.ensureVisible(
           context,
           duration: Duration(milliseconds: 300),
-          //alignment: -96.0,
+          alignment: decoration?.focusAlignment ?? 0.0,
         ),
       );
     } else {
@@ -362,17 +364,18 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
   @override
   TextEditingValue get currentTextEditingValue => control._value;
 
+/* currently only in master branche
   // unused
   @override
   AutofillScope get currentAutofillScope => null;
 
   // unused
   @override
-  void connectionClosed() {}
-
+  void showAutocorrectionPromptRect(int start, int end) {}
+*/
   // unused
   @override
-  void showAutocorrectionPromptRect(int start, int end) {}
+  void connectionClosed() {}
 
   // unused
   @override
