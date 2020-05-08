@@ -80,8 +80,8 @@ class InputCodeControl extends BaseModel with StateControl {
     notifyState();
   }
 
-  void _setCodeConfiguration(int length, bool obscure) {
-    _count = length;
+  void _setCodeConfiguration(int count, bool obscure) {
+    _count = count;
     _obscure = obscure;
 
     if (value.length > _count) {
@@ -243,6 +243,17 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
     if (autofocus && holder.state.mounted) {
       FocusScope.of(context).autofocus(control.focusNode);
     }
+  }
+
+  @override
+  bool shouldUpdate(CoreWidget oldWidget) {
+    final old = oldWidget as InputCodeField;
+
+    if (count != old.count || obscure != old.obscure) {
+      control._setCodeConfiguration(count, obscure);
+    }
+
+    return super.shouldUpdate(oldWidget);
   }
 
   @override
