@@ -1,16 +1,16 @@
 Widget providing input code field to insert pin, sms and other auth codes.\
 Also can be used for time/date or any highly formatted input.
 
-[InputCodeControl] handles all logic parts, validation, holds current value and index pointer to next field. InputCodeControl is [StateControl] so other widgets can subscribe and listen about changes.\
-Control also provides Keyboard Action Event and automatically fires this event when code is filled. Can be used to validate code or to focus next field.
+**[InputCodeControl]** handles all logic parts, validation, holds current value and index pointer to next field. InputCodeControl is **[StateControl]** so other widgets can subscribe and listen about changes.\
+And provides Keyboard Action Event and automatically fires this event when code is filled. Can be used to validate code or to focus next field.
 
-Standard [InputCodeField] is drawn with underline and can be customized with [InputCodeDecoration]. Supports enable/disable state, obscuring, sizing, coloring, etc..
+Standard **[InputCodeField]** is drawn with underline and can be customized with **[InputCodeDecoration]**. Supports enable/disable state, obscuring, sizing, coloring, etc..
 
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code.png)
 
-For better visual control is used [itemBuilder] to build custom Code Field Item. Builder providing BuildContext and index of current field.\
-To get char at given index use [] operator on [InputCodeControl].\
-To check if item has focus use [InputCodeControl.isFocused(index)].
+For better visual control is used **itemBuilder** to build custom Code Field Item. Builder providing BuildContext and index of current field.\
+To get char at given index use [] operator on **[InputCodeControl]**.\
+To check if item has focus use **InputCodeControl.isFocused(index)**.
 
 ```dart
 InputCodeField(
@@ -55,7 +55,7 @@ class CustomCodeItem extends StatelessWidget {
 
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code_item.png)
 
-For total visual control is used [builder] to build whole input widget. [InputCodeField] and [InputCodeControl] still handles all input logic and keyboard actions.
+For total visual control use **builder** to build whole input widget. **[InputCodeField]** and **[InputCodeControl]** still handles all input logic and keyboard actions.
 
 ```dart
 InputCodeField(
