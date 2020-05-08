@@ -9,7 +9,7 @@ Standard **[InputCodeField]** is drawn with underline and can be customized with
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code.png)
 
 For better visual control is used **itemBuilder** to build custom Code Field Item. Builder providing BuildContext and index of current field.\
-To get char at given index use [] operator on **[InputCodeControl]**.\
+To get char at given index use **[]** operator on **[InputCodeControl]**.\
 To check if item has focus use **InputCodeControl.isFocused(index)**.
 
 ```dart
