@@ -1,6 +1,6 @@
 name: code_field
 description: Widget providing input code field to insert pin, sms and other auth codes.
-version: 0.1.0
+version: 0.1.1
 
 homepage: https://github.com/romanbase/code_field
 
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_control: 0.97.1+2
+  flutter_control: ^0.97.1+2
 
 dev_dependencies:
   flutter_test:
