@@ -13,13 +13,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ControlRoot(
-      disableLoader: true,
       initializers: {
         AuthControl: (_) => AuthControl(),
       },
-      root: (context, args) => AuthPage(),
-      app: (context, key, home) => MaterialApp(
-        key: key,
+      states: [
+        AppState.main.build((context) => AuthPage()),
+      ],
+      app: (setup, home) => MaterialApp(
+        key: setup.key,
         home: home,
         title: 'Code Field',
         theme: ThemeData(

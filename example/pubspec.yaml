@@ -24,7 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_control: 0.97.1+2
+  flutter_control: any
 
   code_field:
     path: ../

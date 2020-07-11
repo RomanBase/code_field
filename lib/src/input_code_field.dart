@@ -248,14 +248,14 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
   }
 
   @override
-  bool shouldUpdate(CoreWidget oldWidget) {
+  void onUpdate(CoreWidget oldWidget) {
+    super.onUpdate(oldWidget);
+
     final old = oldWidget as InputCodeField;
 
     if (count != old.count || obscure != old.obscure) {
       control._setCodeConfiguration(count, obscure);
     }
-
-    return super.shouldUpdate(oldWidget);
   }
 
   @override
