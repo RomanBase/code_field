@@ -7,7 +7,7 @@ And supports **backspace** keyboard button.
 Standard `InputCodeField` is drawn with underline and can be customized with `InputCodeDecoration`. Supports enable/disable state, obscuring, sizing, coloring, etc..
 
 ```dart
-final code = InputCodeControl(inputRegex: '^[0-9]*\$');
+final code = InputCodeControl(inputRegex: '^[0-9]*$');
 
 InputCodeField(
   control: code,
