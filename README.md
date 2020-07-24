@@ -6,6 +6,19 @@ And supports **backspace** keyboard button.
 
 Standard `InputCodeField` is drawn with underline and can be customized with `InputCodeDecoration`. Supports enable/disable state, obscuring, sizing, coloring, etc..
 
+```dart
+final code = InputCodeControl(inputRegex: '^[0-9]*\$');
+
+InputCodeField(
+  control: code,
+  count: 6,
+  inputType: TextInputType.number,
+  decoration: InputCodeDecoration(
+    focusColor: Colors.blueGrey,
+  ),
+),
+```
+
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code.png)
 
 For better visual control can be used **itemBuilder** to build custom Code Field Item. Builder providing BuildContext and index of current field.\
@@ -137,6 +150,5 @@ class CustomCodeField extends StatelessWidget {
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code_widget.png)
 
 **What's missing:**
-- tests and documentation
 - overriding/editing from middle
 - copy/paste toolbar
