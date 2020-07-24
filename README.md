@@ -1,16 +1,16 @@
 Widget providing input code field to insert pin, sms and other auth codes.\
-Also can be used for time/date or any highly formatted input.
+Also can be used for time/date or any highly formatted input.\
+And supports **backspace** keyboard button.
 
-**[InputCodeControl]** handles all logic parts, validation, holds current value and index pointer to next field. InputCodeControl is **[StateControl]** so other widgets can subscribe and listen about changes.\
-And provides Keyboard Action Event and automatically fires this event when code is filled. Can be used to validate code or to focus next field.
+`InputCodeControl` handles all logic parts, input validation, holds current value and index pointer to next field.\
 
-Standard **[InputCodeField]** is drawn with underline and can be customized with **[InputCodeDecoration]**. Supports enable/disable state, obscuring, sizing, coloring, etc..
+Standard `InputCodeField` is drawn with underline and can be customized with `InputCodeDecoration`. Supports enable/disable state, obscuring, sizing, coloring, etc..
 
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code.png)
 
-For better visual control is used **itemBuilder** to build custom Code Field Item. Builder providing BuildContext and index of current field.\
-To get char at given index use **[]** operator on **[InputCodeControl]**.\
-To check if item has focus use **InputCodeControl.isFocused(index)**.
+For better visual control can be used **itemBuilder** to build custom Code Field Item. Builder providing BuildContext and index of current field.\
+To get char at given index use `[]` operator on **InputCodeControl**.\
+To check if item has focus use `InputCodeControl.isFocused(index)` and `InputCodeControl.hasFocus` to check if whole Field has focus.
 
 ```dart
 InputCodeField(
@@ -24,12 +24,14 @@ InputCodeField(
 
 class CustomCodeItem extends StatelessWidget {
   final String char;
-  final bool focused;
+  final bool fieldFocused;
+  final bool itemFocused;
 
   const CustomCodeItem({
     Key key,
     this.char: '',
-    this.focused: false,
+    this.fieldFocused: false,
+    this.itemFocused: false,
   }) : super(key: key);
 
   @override
@@ -39,8 +41,8 @@ class CustomCodeItem extends StatelessWidget {
       height: 42.0,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6.0),
-        color: focused ? Colors.grey : Colors.grey.withOpacity(0.25),
-        border: Border.all(color: focused ? Colors.black : Colors.grey),
+        color: fieldFocused ? (itemFocused ? Colors.grey : Colors.grey.withOpacity(0.5)) : Colors.grey.withOpacity(0.25),
+        border: Border.all(color: itemFocused ? Colors.black : Colors.grey),
       ),
       child: Center(
         child: Text(
@@ -55,7 +57,7 @@ class CustomCodeItem extends StatelessWidget {
 
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code_item.png)
 
-For total visual control use **builder** to build whole input widget. **[InputCodeField]** and **[InputCodeControl]** still handles all input logic and keyboard actions.
+For total visual control use **builder** to build whole input widget. `InputCodeField` and `InputCodeControl` still handles all input logic and keyboard actions.
 
 ```dart
 InputCodeField(

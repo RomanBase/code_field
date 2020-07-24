@@ -48,7 +48,8 @@ class AuthPage extends SingleControlWidget<AuthControl> with ThemeProvider {
             inputType: TextInputType.text,
             itemBuilder: (context, index) => CustomCodeItem(
               char: control.stringCode.code[index],
-              focused: control.stringCode.code.isFocused(index),
+              fieldFocused: control.stringCode.code.hasFocus,
+              itemFocused: control.stringCode.code.isFocused(index),
             ),
           ),
           SizedBox(
@@ -128,12 +129,14 @@ class AuthCodeField extends StateboundWidget<AuthCodeModel> {
 
 class CustomCodeItem extends StatelessWidget {
   final String char;
-  final bool focused;
+  final bool fieldFocused;
+  final bool itemFocused;
 
   const CustomCodeItem({
     Key key,
-    this.char: '',
-    this.focused: false,
+    this.char,
+    this.fieldFocused: false,
+    this.itemFocused: false,
   }) : super(key: key);
 
   @override
@@ -143,8 +146,8 @@ class CustomCodeItem extends StatelessWidget {
       height: 42.0,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6.0),
-        color: focused ? Colors.grey : Colors.grey.withOpacity(0.25),
-        border: Border.all(color: focused ? Colors.black : Colors.grey),
+        color: fieldFocused ? (itemFocused ? Colors.grey : Colors.grey.withOpacity(0.5)) : Colors.grey.withOpacity(0.25),
+        border: Border.all(color: itemFocused ? Colors.black : Colors.grey),
       ),
       child: Center(
         child: Text(

@@ -1,11 +1,9 @@
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_control/core.dart';
 
-class InputCodeControl extends BaseModel with StateControl {
-  final key = GlobalKey();
-
+class InputCodeControl extends ChangeNotifier {
   final focusNode = FocusNode();
 
   bool get hasFocus => focusNode.hasFocus;
@@ -77,7 +75,7 @@ class InputCodeControl extends BaseModel with StateControl {
 
     _obscure = value;
 
-    notifyState();
+    notifyListeners();
   }
 
   void _setCodeConfiguration(int count, bool obscure) {
@@ -110,6 +108,11 @@ class InputCodeControl extends BaseModel with StateControl {
       return;
     }
 
+    if (_value.text == value.text) {
+      _value = value;
+      return;
+    }
+
     if (value.text.length > _count || !validateInput(value.text)) {
       if (inputActive) {
         _connection?.setEditingState(_valueCursor);
@@ -119,14 +122,13 @@ class InputCodeControl extends BaseModel with StateControl {
     }
 
     _value = value;
-
     _activeIndex = value.text.length;
 
     if (isInitialized && activeIndex == _count) {
       _onDone();
     }
 
-    notifyState();
+    notifyListeners();
   }
 
   void _onDone() {
@@ -194,7 +196,8 @@ class InputCodeDecoration {
   });
 }
 
-class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, ThemeProvider implements TextInputClient {
+class InputCodeField extends StatefulWidget {
+  final InputCodeControl control;
   final int count;
   final double spacing;
   final bool autofocus;
@@ -212,7 +215,8 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
   /// [builder] custom widget builder - Full control of Widget, return all code fields. Everything is ignored. Use [] operator on [InputCodeControl] or [InputCodeField] to get [char] for field at given index.
   /// [decoration] use to decorate default field style. Used only when [itemBuilder] and [builder] is null.
   InputCodeField({
-    @required InputCodeControl control,
+    Key key,
+    @required this.control,
     this.count: 6,
     this.spacing: 8.0,
     this.autofocus: false,
@@ -224,37 +228,49 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
     this.enabled: true,
     this.obscure: false,
   })  : assert(count > 0),
-        super(key: control.key, control: control);
+        super(key: key);
+
+  @override
+  _InputCodeFieldState createState() => _InputCodeFieldState();
+}
+
+class _InputCodeFieldState extends State<InputCodeField> implements TextInputClient {
+  InputCodeControl get control => widget.control;
 
   TextInputConfiguration get _inputConfig => TextInputConfiguration(
-        inputType: inputType,
-        inputAction: inputAction,
+        inputType: widget.inputType,
+        inputAction: widget.inputAction,
         autocorrect: false,
         enableSuggestions: false,
       );
 
   @override
-  void onInit(Map args) {
-    super.onInit(args);
+  void initState() {
+    super.initState();
 
-    control._setCodeConfiguration(count, obscure);
-  }
+    control._setCodeConfiguration(widget.count, widget.obscure);
 
-  @override
-  void onLayout() {
-    if (autofocus && holder.state.mounted) {
-      FocusScope.of(context).autofocus(control.focusNode);
+    if (widget.autofocus) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (mounted) {
+          FocusScope.of(context).autofocus(control.focusNode);
+        }
+      });
     }
+
+    control.addListener(_notifyState);
+  }
+
+  void _notifyState() {
+    setState(() {});
   }
 
   @override
-  void onUpdate(CoreWidget oldWidget) {
-    super.onUpdate(oldWidget);
+  void didUpdateWidget(InputCodeField oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
-    final old = oldWidget as InputCodeField;
-
-    if (count != old.count || obscure != old.obscure) {
-      control._setCodeConfiguration(count, obscure);
+    if (widget.count != oldWidget.count || widget.obscure != oldWidget.obscure) {
+      control._setCodeConfiguration(widget.count, widget.obscure);
     }
   }
 
@@ -262,7 +278,7 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (!enabled) {
+        if (!widget.enabled) {
           return;
         }
 
@@ -273,7 +289,7 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
         }
       },
       onLongPress: () async {
-        if (!enabled) {
+        if (!widget.enabled) {
           return;
         }
 
@@ -288,25 +304,26 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
   }
 
   Widget _buildWidget(BuildContext context) {
-    return builder == null
+    return widget.builder == null
         ? Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
-            children: List<Widget>.generate(count, (index) => _buildInput(context, index, control.isFocused(index) && enabled))
+            children: List<Widget>.generate(widget.count, (index) => _buildInput(context, index, control.isFocused(index) && widget.enabled))
                 .expand((item) sync* {
-                  yield SizedBox(width: spacing);
+                  yield SizedBox(width: widget.spacing);
                   yield item;
                 })
                 .skip(1)
                 .toList(),
           )
-        : builder(context);
+        : widget.builder(context);
   }
 
   Widget _buildInput(BuildContext context, int index, bool hasFocus) {
-    final decoration = this.decoration ?? InputCodeDecoration();
+    final theme = Theme.of(context);
+    final decoration = this.widget.decoration ?? InputCodeDecoration();
 
-    return itemBuilder == null
+    return widget.itemBuilder == null
         ? Flexible(
             fit: decoration.width > 0.0 ? FlexFit.loose : FlexFit.tight,
             child: Container(
@@ -315,7 +332,7 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
                   BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: (hasFocus ? (decoration.focusColor ?? theme.primaryColorDark) : (enabled ? (decoration.color ?? theme.primaryColor) : (decoration.disableColor ?? theme.data.disabledColor))).withOpacity(control.hasFocus ? 1.0 : 0.5),
+                        color: (hasFocus ? (decoration.focusColor ?? theme.primaryColorDark) : (widget.enabled ? (decoration.color ?? theme.primaryColor) : (decoration.disableColor ?? theme.disabledColor))).withOpacity(control.hasFocus ? 1.0 : 0.5),
                         width: 2.0,
                       ),
                     ),
@@ -323,12 +340,12 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
               child: Center(
                 child: Text(
                   (control[index].isNotEmpty && control.isObscured) ? '•' : control[index],
-                  style: enabled ? (decoration.textStyle ?? fontPrimary.headline3) : (decoration.disableTextStyle ?? fontPrimary.headline3.copyWith(color: theme.data.disabledColor)),
+                  style: widget.enabled ? (decoration.textStyle ?? theme.primaryTextTheme.headline3) : (decoration.disableTextStyle ?? theme.primaryTextTheme.headline3.copyWith(color: theme.disabledColor)),
                 ),
               ),
             ),
           )
-        : itemBuilder(context, index);
+        : widget.itemBuilder(context, index);
   }
 
   void _handleFocus(bool hasFocus) {
@@ -345,14 +362,14 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
         () => Scrollable.ensureVisible(
           context,
           duration: Duration(milliseconds: 300),
-          alignment: decoration?.focusAlignment ?? 0.0,
+          alignment: widget.decoration?.focusAlignment ?? 0.0,
         ),
       );
     } else {
       control._connection?.close();
     }
 
-    control.notifyState();
+    _notifyState();
   }
 
   @override
@@ -364,20 +381,17 @@ class InputCodeField extends StateboundWidget<InputCodeControl> with OnLayout, T
   @override
   TextEditingValue get currentTextEditingValue => control._value;
 
-/* currently only in master branche
-  // unused
-  @override
-  AutofillScope get currentAutofillScope => null;
-
-  // unused
-  @override
-  void showAutocorrectionPromptRect(int start, int end) {}
-*/
-  // unused
   @override
   void connectionClosed() {}
 
-  // unused
   @override
   void updateFloatingCursor(RawFloatingCursorPoint point) {}
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    control.removeListener(_notifyState);
+    control.dispose();
+  }
 }

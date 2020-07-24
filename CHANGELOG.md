@@ -1,3 +1,3 @@
-## [0.0.1] - TODO: Add release date.
+## [0.3.0] - Remove [flutter_control](https://github.com/RomanBase/flutter_control/) dependency.
 
-* TODO: Describe initial release.
+`TextInputClient` and `TextInputConnection` based solution of Code Field.\
