@@ -3,46 +3,73 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Controls [InputCodeField], receives input and handles value changes.
+/// Implements [TextInputConnection] and receives all keyboard events.
 class InputCodeControl extends ChangeNotifier {
-  final focusNode = FocusNode();
+  /// Handles focus of Widget.
+  final _focusNode = FocusNode();
 
+  /// Focus node of [InputCodeField]. Used to auto focus and also to ensure visibility when Widget is activated.
+  FocusNode get focusNode => _focusNode;
+
+  /// Checks if corresponding [InputCodeField] is focused.
   bool get hasFocus => focusNode.hasFocus;
 
+  /// Text and Action input.
   TextInputConnection _connection;
 
+  /// Next index to fill.
   int _activeIndex = 0;
 
+  /// Returns index of active field - next index to fill.
   int get activeIndex => _activeIndex;
 
+  /// Current text value - an input state.
   TextEditingValue _value = TextEditingValue();
 
+  /// Current text value with correct cursor position.
   TextEditingValue get _valueCursor => _value.copyWith(selection: TextSelection.collapsed(offset: activeIndex));
 
+  /// Returns current text value.
   String get value => _value.text ?? '';
 
+  /// Sets current text value.
   set value(String code) => _updateText(code);
 
+  /// Number of fields.
   int _count = 0;
 
+  /// Returns number of fields - required text length.
   int get count => _count;
 
-  bool get isInitialized => _count > 0;
+  /// Returns number of not empty fields - text length.
+  int get filledCount => value.length;
 
-  bool get isFilled => value.length == _count;
+  /// Returns `true` if all fields are filled.
+  bool get isFilled => filledCount == count;
 
+  /// Checks if control is ready to use and mounted to Widget.
+  bool get isInitialized => count > 0;
+
+  /// Checks if input connection is attached.
   bool get inputActive => _connection?.attached ?? false;
 
+  /// Callback when last field is filled.
   VoidCallback _done;
 
+  /// String regex to filter input. Matching test is applied at whole text value.
+  /// So use ^[0-9]*$ to match only numbers.
   String inputRegex;
 
+  /// Obscure input fields.
   bool _obscure;
 
+  /// Checks if input fields are obscured and text should be hidden.
   bool get isObscured => _obscure;
 
-  /// [code] - initial text
-  /// [inputRegex] - regex just for input, not for final validation. Use [isFilled] to check if full code is inserted.
-  /// For example use ^[0-9]*$ to match only numbers. Regex is also used for text copied from Clipboard.
+  /// Controls [InputCodeField], receives input from keyboard and handles value editing.
+  /// [code] - Initial value.
+  /// [inputRegex] - String regex to filter input. Matching test is applied at whole text value.
   InputCodeControl({String code, this.inputRegex}) {
     if (code != null) {
       _value = TextEditingValue(text: code);
@@ -50,34 +77,7 @@ class InputCodeControl extends ChangeNotifier {
     }
   }
 
-  String operator [](int index) {
-    if (value.length > index) {
-      return value[index];
-    }
-
-    return '';
-  }
-
-  bool validateInput(String value) {
-    if (inputRegex == null) {
-      return true;
-    }
-
-    return RegExp(inputRegex).hasMatch(value ?? '');
-  }
-
-  void done(VoidCallback callback) => _done = callback;
-
-  void setObscure(bool value) {
-    if (isObscured == value) {
-      return;
-    }
-
-    _obscure = value;
-
-    notifyListeners();
-  }
-
+  /// Configures this control based on [InputCodeField] properties.
   void _setCodeConfiguration(int count, bool obscure) {
     _count = count;
     _obscure = obscure;
@@ -87,6 +87,42 @@ class InputCodeControl extends ChangeNotifier {
     }
   }
 
+  /// Returns char at given [index] or empty String.
+  String operator [](int index) {
+    if (value.length > index) {
+      return value[index];
+    }
+
+    return '';
+  }
+
+  /// Validates input [value] with [inputRegex].
+  bool validateInput(String value) {
+    if (inputRegex == null) {
+      return true;
+    }
+
+    return RegExp(inputRegex).hasMatch(value ?? '');
+  }
+
+  /// Registers [VoidCallback] that is triggered when last field is filled.
+  void done(VoidCallback callback) => _done = callback;
+
+  /// Sets field to be obscured and notifies Widget to hide values.
+  void setObscure(bool value) {
+    assert(isInitialized);
+
+    if (isObscured == value) {
+      return;
+    }
+
+    _obscure = value;
+
+    notifyListeners();
+  }
+
+  /// Updates [TextEditingValue] with given [text] and sets cursor to correct position.
+  /// If input validation fails and connection is assembled, previous value is send to input client.
   void _updateText(String text) {
     if (text == null) {
       _updateValue(TextEditingValue());
@@ -103,6 +139,8 @@ class InputCodeControl extends ChangeNotifier {
     }
   }
 
+  /// Updates current [TextEditingValue] if [value] is different and notifies Widget.
+  /// Also handles [done] callback when all fields are filled.
   void _updateValue(TextEditingValue value) {
     if (_value == value) {
       return;
@@ -114,6 +152,7 @@ class InputCodeControl extends ChangeNotifier {
     }
 
     if (value.text.length > _count || !validateInput(value.text)) {
+      // Seems like duplicate call, but value can be updated directly by TextInputClient.
       if (inputActive) {
         _connection?.setEditingState(_valueCursor);
       }
@@ -131,22 +170,27 @@ class InputCodeControl extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onDone() {
-    if (_done != null) {
-      _done();
-    }
-  }
+  /// Executes [done] callback.
+  void _onDone() => _done?.call();
 
+  /// Removes focus from [focusNode].
+  /// Check [FocusNode.unfocus].
   void unfocus() => focusNode.unfocus();
 
+  /// Requests focus for [focusNode].
+  /// Check [FocusNode.requestFocus].
   void focus() => focusNode.requestFocus();
 
+  /// Checks if field at given [index] is focused.
+  /// [clamp] - Returned value is clamped between 0 and last possible index - useful to highlight last field when is filled.
   bool isFocused(int index, [bool clamp = false]) {
     return hasFocus && (clamp ? math.min(_activeIndex, count - 1) : _activeIndex) == index;
   }
 
+  /// Clears current text and sets empty [TextEditingValue].
   void clear() => value = null;
 
+  /// Helper function to copy/paste value from System clipboard.
   Future<void> copyFromClipboard() async {
     ClipboardData data = await Clipboard.getData(Clipboard.kTextPlain);
 
@@ -155,6 +199,7 @@ class InputCodeControl extends ChangeNotifier {
     }
   }
 
+  /// Helper function to copy current value to System clipboard.
   Future<void> copyToClipboard() {
     return Clipboard.setData(ClipboardData(text: value));
   }
@@ -170,6 +215,8 @@ class InputCodeControl extends ChangeNotifier {
   }
 }
 
+/// Basic entity to hold decoration of default input look.
+/// Used only when [InputCodeField.builder] and [InputCodeField.itemBuilder] is null.
 class InputCodeDecoration {
   final Color color;
   final Color focusColor;
@@ -196,6 +243,8 @@ class InputCodeDecoration {
   });
 }
 
+/// Code text field - draws separated input fields for each char.
+/// State implements [TextInputClient] so [InputCodeControl] can receive all keyboard inputs and actions.
 class InputCodeField extends StatefulWidget {
   final InputCodeControl control;
   final int count;
@@ -209,10 +258,10 @@ class InputCodeField extends StatefulWidget {
   final bool enabled;
   final bool obscure;
 
-  /// [count] number of fields, can't be null.
+  /// [count] number of fields, can't be null or zero.
   /// [spacing] distance between fields.
   /// [itemBuilder] custom field builder - [Row] and spacing is generated, return just one code field. [decoration] is ignored.
-  /// [builder] custom widget builder - Full control of Widget, return all code fields. Everything is ignored. Use [] operator on [InputCodeControl] or [InputCodeField] to get [char] for field at given index.
+  /// [builder] custom widget builder - Full control of Widget, return all code fields. Everything is ignored. Use [] operator on [InputCodeControl] to get [char] for field at given index.
   /// [decoration] use to decorate default field style. Used only when [itemBuilder] and [builder] is null.
   InputCodeField({
     Key key,
@@ -227,13 +276,14 @@ class InputCodeField extends StatefulWidget {
     this.decoration,
     this.enabled: true,
     this.obscure: false,
-  })  : assert(count > 0),
+  })  : assert(count != null && count > 0),
         super(key: key);
 
   @override
   _InputCodeFieldState createState() => _InputCodeFieldState();
 }
 
+/// State of [InputCodeField].
 class _InputCodeFieldState extends State<InputCodeField> implements TextInputClient {
   InputCodeControl get control => widget.control;
 
