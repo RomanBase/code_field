@@ -7,10 +7,10 @@ And supports **backspace** keyboard button.
 Standard `InputCodeField` is drawn with underline and can be customized with `InputCodeDecoration`. Supports enable/disable state, obscuring, sizing, coloring, etc..
 
 ```dart
-final code = InputCodeControl(inputRegex: '^[0-9]*$');
+final codeControl = InputCodeControl(inputRegex: '^[0-9]*$');
 
 InputCodeField(
-  control: code,
+  control: codeControl,
   count: 6,
   inputType: TextInputType.number,
   decoration: InputCodeDecoration(
@@ -21,9 +21,9 @@ InputCodeField(
 
 ![Structure](https://raw.githubusercontent.com/RomanBase/code_field/master/doc/code.png)
 
-For better visual control can be used **itemBuilder** to build custom Code Field Item. Builder providing BuildContext and index of current field.\
+For better visual control can be used **itemBuilder** to build custom Field Item.\
 To get char at given index use `[]` operator on **InputCodeControl**.\
-To check if item has focus use `InputCodeControl.isFocused(index)` and `InputCodeControl.hasFocus` to check if whole Field has focus.
+To check if item at given index is focused use `InputCodeControl.isFocused(index)` and `InputCodeControl.hasFocus` to check if whole Widget has focus.
 
 ```dart
 InputCodeField(
