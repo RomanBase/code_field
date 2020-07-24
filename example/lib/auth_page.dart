@@ -33,7 +33,9 @@ class AuthPage extends SingleControlWidget<AuthControl> with ThemeProvider {
                 builder: (context, value) {
                   return RaisedButton(
                     onPressed: control.numberCode.toggleObscure,
-                    child: Icon(value.isObscured ? Icons.visibility_off : Icons.visibility),
+                    child: Icon(value.isObscured
+                        ? Icons.visibility_off
+                        : Icons.visibility),
                   );
                 },
               ),
@@ -146,7 +148,9 @@ class CustomCodeItem extends StatelessWidget {
       height: 42.0,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6.0),
-        color: fieldFocused ? (itemFocused ? Colors.grey : Colors.grey.withOpacity(0.5)) : Colors.grey.withOpacity(0.25),
+        color: fieldFocused
+            ? (itemFocused ? Colors.grey : Colors.grey.withOpacity(0.5))
+            : Colors.grey.withOpacity(0.25),
         border: Border.all(color: itemFocused ? Colors.black : Colors.grey),
       ),
       child: Center(
@@ -190,7 +194,9 @@ class CustomCodeField extends StatelessWidget {
       items.add(Expanded(
         child: Container(
           height: 42.0,
-          color: control.isFocused(i, true) ? Colors.greenAccent.withOpacity(0.25) : Colors.transparent,
+          color: control.isFocused(i, true)
+              ? Colors.greenAccent.withOpacity(0.25)
+              : Colors.transparent,
           child: Center(
             child: Text(
               control[i],
@@ -214,7 +220,8 @@ class CustomCodeField extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(color: control.hasFocus ? Colors.green : Colors.blueGrey),
+          border: Border.all(
+              color: control.hasFocus ? Colors.green : Colors.blueGrey),
         ),
         child: Row(
           children: items,
