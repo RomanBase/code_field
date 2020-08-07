@@ -1,6 +1,6 @@
 name: code_field
 description: Widget providing input code field to insert pin, sms and other auth codes.
-version: 0.3.1
+version: 0.3.1+1
 
 homepage: https://github.com/romanbase/code_field
 
