@@ -2,6 +2,10 @@ Widget providing input code field to insert pin, sms and other auth codes.\
 Also can be used for time/date or any highly formatted input.\
 And supports **backspace** keyboard button.
 
+```dart
+import 'package:code_field/code_field.dart';
+```
+
 `InputCodeControl` handles all logic parts, input validation, holds current value and index pointer to next field.\
 
 Standard `InputCodeField` is drawn with underline and can be customized with `InputCodeDecoration`. Supports enable/disable state, obscuring, sizing, coloring, etc..
@@ -29,8 +33,9 @@ To check if item at given index is focused use `InputCodeControl.isFocused(index
 InputCodeField(
   control: codeControl
   itemBuilder: (context, index) => CustomCodeItem(
-    char: codeControl[index],
-    focused: codeControl.isFocused(index),
+      char: control.stringCode.code[index],
+      fieldFocused: codeControl.hasFocus,
+      itemFocused: codeControl.isFocused(index),
     ),
 );
 
