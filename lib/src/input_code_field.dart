@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 /// Implements [TextInputConnection] and receives all keyboard events.
 class InputCodeControl extends ChangeNotifier {
   /// Handles focus of Widget.
-  final _focusNode = FocusNode(); //TODO: on use ? dispose/init new lazily..
+  final _focusNode = FocusNode();
 
   /// Focus node of [InputCodeField]. Used to auto focus and also to ensure visibility when Widget is activated.
   FocusNode get focusNode => _focusNode;
