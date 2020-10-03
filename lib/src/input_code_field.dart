@@ -448,6 +448,9 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
   void showAutocorrectionPromptRect(int start, int end) {}
 
   @override
+  void performPrivateCommand(String action, Map<String, dynamic> data) {}
+
+  @override
   void dispose() {
     super.dispose();
 
