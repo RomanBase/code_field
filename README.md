@@ -6,7 +6,7 @@ And supports **backspace** keyboard button.
 import 'package:code_field/code_field.dart';
 ```
 
-`InputCodeControl` handles all logic parts, input validation, holds current value and index pointer to next field.\
+`InputCodeControl` handles all logic parts, input validation, holds current value and index pointer to next field.
 
 Standard `InputCodeField` is drawn with underline and can be customized with `InputCodeDecoration`. Supports enable/disable state, obscuring, sizing, coloring, etc..
 

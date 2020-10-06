@@ -233,6 +233,8 @@ class InputCodeDecoration {
   final double height;
   final double focusAlignment;
 
+  //TODO: documentation
+  //TODO: assert required fields
   const InputCodeDecoration({
     this.color,
     this.focusColor,
@@ -262,6 +264,7 @@ class InputCodeField extends StatefulWidget {
   final bool enabled;
   final bool obscure;
 
+  //TODO: documentation
   /// [count] number of fields, can't be null or zero.
   /// [spacing] distance between fields.
   /// [itemBuilder] custom field builder - [Row] and spacing is generated, return just one code field. [decoration] is ignored.
@@ -271,13 +274,13 @@ class InputCodeField extends StatefulWidget {
     Key key,
     @required this.control,
     this.count: 6,
-    this.spacing: 8.0,
+    this.spacing: 8.0, //TODO: move to decoration
     this.autofocus: false,
     this.inputType: TextInputType.number,
     this.inputAction: TextInputAction.done,
     this.itemBuilder,
     this.builder,
-    this.decoration,
+    this.decoration, //TODO: default const decoration with assert
     this.enabled: true,
     this.obscure: false,
   })  : assert(count != null && count > 0),
@@ -384,6 +387,7 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
               constraints: BoxConstraints.expand(width: decoration.width, height: decoration.height),
               decoration: (hasFocus ? decoration.focusedBox : decoration.box) ??
                   BoxDecoration(
+                    //TODO: animate decoration ?
                     border: Border(
                       bottom: BorderSide(
                         color: (hasFocus ? (decoration.focusColor ?? theme.primaryColorDark) : (widget.enabled ? (decoration.color ?? theme.primaryColor) : (decoration.disableColor ?? theme.disabledColor))).withOpacity(control.hasFocus ? 1.0 : 0.5),
