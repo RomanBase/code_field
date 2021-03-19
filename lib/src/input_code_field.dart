@@ -16,7 +16,7 @@ class InputCodeControl extends ChangeNotifier {
   bool get hasFocus => focusNode.hasFocus;
 
   /// Text and Action input.
-  TextInputConnection _connection;
+  TextInputConnection? _connection;
 
   /// Next index to fill.
   int _activeIndex = 0;
@@ -31,10 +31,10 @@ class InputCodeControl extends ChangeNotifier {
   TextEditingValue get _valueCursor => _value.copyWith(selection: TextSelection.collapsed(offset: activeIndex));
 
   /// Returns current text value.
-  String get value => _value.text ?? '';
+  String get value => _value.text;
 
   /// Sets current text value.
-  set value(String code) => _updateText(code);
+  set value(String? code) => _updateText(code);
 
   /// Number of fields.
   int _count = 0;
@@ -55,22 +55,22 @@ class InputCodeControl extends ChangeNotifier {
   bool get inputActive => _connection?.attached ?? false;
 
   /// Callback when last field is filled.
-  VoidCallback _done;
+  VoidCallback? _done;
 
   /// String regex to filter input. Matching test is applied at whole text value.
   /// So use ^[0-9]*$ to match only numbers.
-  String inputRegex;
+  String? inputRegex;
 
   /// Obscure input fields.
-  bool _obscure;
+  bool? _obscure;
 
   /// Checks if input fields are obscured and text should be hidden.
-  bool get isObscured => _obscure;
+  bool get isObscured => _obscure!;
 
   /// Controls [InputCodeField], receives input from keyboard and handles value editing.
   /// [code] - Initial value.
   /// [inputRegex] - String regex to filter input. Matching test is applied at whole text value.
-  InputCodeControl({String code, this.inputRegex}) {
+  InputCodeControl({String? code, this.inputRegex}) {
     if (code != null) {
       _value = TextEditingValue(text: code);
       _activeIndex = code.length;
@@ -102,7 +102,7 @@ class InputCodeControl extends ChangeNotifier {
       return true;
     }
 
-    return RegExp(inputRegex).hasMatch(value ?? '');
+    return RegExp(inputRegex!).hasMatch(value);
   }
 
   /// Registers [VoidCallback] that is triggered when last field is filled.
@@ -123,7 +123,7 @@ class InputCodeControl extends ChangeNotifier {
 
   /// Updates [TextEditingValue] with given [text] and sets cursor to correct position.
   /// If input validation fails and connection is assembled, previous value is send to input client.
-  void _updateText(String text) {
+  void _updateText(String? text) {
     if (text == null) {
       _updateValue(TextEditingValue());
     } else {
@@ -192,11 +192,9 @@ class InputCodeControl extends ChangeNotifier {
 
   /// Helper function to copy/paste value from System clipboard.
   Future<void> copyFromClipboard() async {
-    ClipboardData data = await Clipboard.getData(Clipboard.kTextPlain);
+    ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
 
-    if (data != null && validateInput(data.text)) {
-      value = data.text;
-    }
+    if (data != null) if (validateInput(data.text!)) value = data.text!;
   }
 
   /// Helper function to copy current value to System clipboard.
@@ -222,19 +220,19 @@ class InputCodeControl extends ChangeNotifier {
 /// Basic entity to hold decoration of default input look.
 /// Used only when [InputCodeField.builder] and [InputCodeField.itemBuilder] is null.
 class InputCodeDecoration {
-  final Color color;
-  final Color focusColor;
-  final TextStyle textStyle;
-  final Color disableColor;
-  final TextStyle disableTextStyle;
-  final BoxDecoration box;
-  final BoxDecoration focusedBox;
-  final double width;
-  final double height;
-  final double focusAlignment;
+  final Color? color;
+  final Color? focusColor;
+  final TextStyle? textStyle;
+  final Color? disableColor;
+  final TextStyle? disableTextStyle;
+  final BoxDecoration? box;
+  final BoxDecoration? focusedBox;
+  final double? width;
+  final double? height;
+  final double? focusAlignment;
 
-  //TODO: documentation
-  //TODO: assert required fields
+//TODO: documentation
+//TODO: assert required fields
   const InputCodeDecoration({
     this.color,
     this.focusColor,
@@ -252,15 +250,15 @@ class InputCodeDecoration {
 /// Code text field - draws separated input fields for each char.
 /// State implements [TextInputClient] so [InputCodeControl] can receive all keyboard inputs and actions.
 class InputCodeField extends StatefulWidget {
-  final InputCodeControl control;
+  final InputCodeControl? control;
   final int count;
   final double spacing;
   final bool autofocus;
   final TextInputType inputType;
   final TextInputAction inputAction;
-  final IndexedWidgetBuilder itemBuilder;
-  final WidgetBuilder builder;
-  final InputCodeDecoration decoration;
+  final IndexedWidgetBuilder? itemBuilder;
+  final WidgetBuilder? builder;
+  final InputCodeDecoration? decoration;
   final bool enabled;
   final bool obscure;
 
@@ -271,7 +269,7 @@ class InputCodeField extends StatefulWidget {
   /// [builder] custom widget builder - Full control of Widget, return all code fields. Everything is ignored. Use [] operator on [InputCodeControl] to get [char] for field at given index.
   /// [decoration] use to decorate default field style. Used only when [itemBuilder] and [builder] is null.
   InputCodeField({
-    Key key,
+    Key? key,
     @required this.control,
     this.count: 6,
     this.spacing: 8.0, //TODO: move to decoration
@@ -283,7 +281,7 @@ class InputCodeField extends StatefulWidget {
     this.decoration, //TODO: default const decoration with assert
     this.enabled: true,
     this.obscure: false,
-  })  : assert(count != null && count > 0),
+  })  : assert(count > 0),
         super(key: key);
 
   @override
@@ -292,7 +290,7 @@ class InputCodeField extends StatefulWidget {
 
 /// State of [InputCodeField].
 class _InputCodeFieldState extends State<InputCodeField> implements TextInputClient {
-  InputCodeControl get control => widget.control;
+  InputCodeControl get control => widget.control!;
 
   TextInputConfiguration get _inputConfig => TextInputConfiguration(
         inputType: widget.inputType,
@@ -308,7 +306,7 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
     control._setCodeConfiguration(widget.count, widget.obscure);
 
     if (widget.autofocus) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
         if (mounted) {
           FocusScope.of(context).autofocus(control.focusNode);
         }
@@ -373,7 +371,7 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
                 .skip(1)
                 .toList(),
           )
-        : widget.builder(context);
+        : widget.builder!(context);
   }
 
   Widget _buildInput(BuildContext context, int index, bool hasFocus) {
@@ -382,7 +380,7 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
 
     return widget.itemBuilder == null
         ? Flexible(
-            fit: decoration.width > 0.0 ? FlexFit.loose : FlexFit.tight,
+            fit: decoration.width! > 0.0 ? FlexFit.loose : FlexFit.tight,
             child: Container(
               constraints: BoxConstraints.expand(width: decoration.width, height: decoration.height),
               decoration: (hasFocus ? decoration.focusedBox : decoration.box) ??
@@ -390,7 +388,10 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
                     //TODO: animate decoration ?
                     border: Border(
                       bottom: BorderSide(
-                        color: (hasFocus ? (decoration.focusColor ?? theme.primaryColorDark) : (widget.enabled ? (decoration.color ?? theme.primaryColor) : (decoration.disableColor ?? theme.disabledColor))).withOpacity(control.hasFocus ? 1.0 : 0.5),
+                        color: (hasFocus
+                                ? (decoration.focusColor ?? theme.primaryColorDark)
+                                : (widget.enabled ? (decoration.color ?? theme.primaryColor) : (decoration.disableColor ?? theme.disabledColor)))
+                            .withOpacity(control.hasFocus ? 1.0 : 0.5),
                         width: 2.0,
                       ),
                     ),
@@ -398,22 +399,24 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
               child: Center(
                 child: Text(
                   (control[index].isNotEmpty && control.isObscured) ? '•' : control[index],
-                  style: widget.enabled ? (decoration.textStyle ?? theme.primaryTextTheme.headline3) : (decoration.disableTextStyle ?? theme.primaryTextTheme.headline3.copyWith(color: theme.disabledColor)),
+                  style: widget.enabled
+                      ? (decoration.textStyle ?? theme.primaryTextTheme.headline3)
+                      : (decoration.disableTextStyle ?? theme.primaryTextTheme.headline3!.copyWith(color: theme.disabledColor)),
                 ),
               ),
             ),
           )
-        : widget.itemBuilder(context, index);
+        : widget.itemBuilder!(context, index);
   }
 
   void _handleFocus(bool hasFocus) {
     if (hasFocus) {
-      if (control._connection == null || !control._connection.attached) {
+      if (control._connection == null || !control._connection!.attached) {
         control._connection = TextInput.attach(this, _inputConfig);
-        control._connection.setEditingState(control._valueCursor);
+        control._connection!.setEditingState(control._valueCursor);
       }
 
-      control._connection.show();
+      control._connection!.show();
 
       Future.delayed(
         Duration(milliseconds: 150), // wait for keyboard
@@ -446,7 +449,7 @@ class _InputCodeFieldState extends State<InputCodeField> implements TextInputCli
   void updateFloatingCursor(RawFloatingCursorPoint point) {}
 
   @override
-  AutofillScope get currentAutofillScope => null;
+  AutofillScope? get currentAutofillScope => null;
 
   @override
   void showAutocorrectionPromptRect(int start, int end) {}
