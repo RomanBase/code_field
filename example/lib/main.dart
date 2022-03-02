@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_control/core.dart';
 
 import 'auth_control.dart';
