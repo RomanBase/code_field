@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 /// Controls [InputCodeField], receives input and handles value changes.
@@ -291,6 +292,8 @@ class InputCodeField extends StatefulWidget {
   _InputCodeFieldState createState() => _InputCodeFieldState();
 }
 
+T? _ambiguate<T>(T? value) => value;
+
 /// State of [InputCodeField].
 class _InputCodeFieldState extends State<InputCodeField>
     implements TextInputClient {
@@ -310,7 +313,7 @@ class _InputCodeFieldState extends State<InputCodeField>
     control._setCodeConfiguration(widget.count, widget.obscure);
 
     if (widget.autofocus) {
-      WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      _ambiguate(SchedulerBinding.instance)!.addPostFrameCallback((timeStamp) {
         if (mounted) {
           FocusScope.of(context).autofocus(control.focusNode);
         }
@@ -482,5 +485,20 @@ class _InputCodeFieldState extends State<InputCodeField>
 
     control.removeListener(_notifyState);
     control._dispose();
+  }
+
+  @override
+  void insertTextPlaceholder(Size size) {
+    // TODO: implement insertTextPlaceholder
+  }
+
+  @override
+  void removeTextPlaceholder() {
+    // TODO: implement removeTextPlaceholder
+  }
+
+  @override
+  void showToolbar() {
+    // TODO: implement showToolbar
   }
 }
