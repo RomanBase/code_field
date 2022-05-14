@@ -1,5 +1,5 @@
 import 'package:code_field/code_field.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter_control/core.dart';
 
 import 'auth_control.dart';
@@ -31,7 +31,7 @@ class AuthPage extends SingleControlWidget<AuthControl> with ThemeProvider {
               NotifierBuilder<InputCodeControl>(
                 control: control.numberCode.code,
                 builder: (context, value) {
-                  return RaisedButton(
+                  return ElevatedButton(
                     onPressed: control.numberCode.toggleObscure,
                     child: Icon(value.isObscured
                         ? Icons.visibility_off
@@ -116,7 +116,7 @@ class AuthCodeField extends StateboundWidget<AuthCodeModel> {
                   ),
               false: (_) => Container(
                     width: 192.0,
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       onPressed: control.validate,
                       child: Text('validate'),
                     ),
@@ -173,7 +173,7 @@ class CustomCodeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = List<Widget>();
+    final items = [];
 
     for (int i = 0; i < control.count; i++) {
       if (i > 0 && i % 3 == 0) {
