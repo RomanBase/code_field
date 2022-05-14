@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:code_field/code_field.dart';
 import 'package:flutter_control/core.dart';
 
-class AuthCodeModel extends BaseModel with StateControl {
+class AuthCodeModel extends BaseModel with ObservableComponent {
   final code = InputCodeControl();
 
   bool loading = false;
@@ -24,20 +24,20 @@ class AuthCodeModel extends BaseModel with StateControl {
 
   void _onFocus() {
     message = null;
-    notifyState();
+    notify();
   }
 
   void validate() async {
     if (!code.isFilled) {
       message = 'code not filled';
-      notifyState();
+      notify();
       return;
     }
 
     code.unfocus();
     loading = true;
     message = null;
-    notifyState();
+    notify();
 
     await Future.delayed(Duration(seconds: 2)); // simulate network call
 
@@ -48,7 +48,7 @@ class AuthCodeModel extends BaseModel with StateControl {
     }
 
     loading = false;
-    notifyState();
+    notify();
   }
 
   void toggleObscure() {

@@ -28,7 +28,7 @@ class AuthPage extends SingleControlWidget<AuthControl> with ThemeProvider {
                   model: control.numberCode,
                 ),
               ),
-              NotifierBuilder<InputCodeControl>(
+              ControlBuilder<InputCodeControl>(
                 control: control.numberCode.code,
                 builder: (context, value) {
                   return ElevatedButton(
@@ -70,7 +70,7 @@ class AuthPage extends SingleControlWidget<AuthControl> with ThemeProvider {
   }
 }
 
-class AuthCodeField extends StateboundWidget<AuthCodeModel> {
+class AuthCodeField extends ControllableWidget<AuthCodeModel> {
   final count;
   final TextInputType inputType;
   final IndexedWidgetBuilder itemBuilder;
@@ -83,7 +83,7 @@ class AuthCodeField extends StateboundWidget<AuthCodeModel> {
     this.inputType: TextInputType.number,
     this.itemBuilder,
     this.widgetBuilder,
-  }) : super(key: key, control: model);
+  }) : super(model, key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +173,7 @@ class CustomCodeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = [];
+    final items = <Widget>[];
 
     for (int i = 0; i < control.count; i++) {
       if (i > 0 && i % 3 == 0) {
